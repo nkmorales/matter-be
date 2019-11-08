@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const userSchema = mongoose.Schema({
   passwordHash: { type: String, required: true },
@@ -7,5 +7,5 @@ const userSchema = mongoose.Schema({
   created: { type: Date, default: () => new Date() }
 });
 
-const User = mongoose.model('user', userSchema);
+const User = mongoose.model("user", userSchema);
 export default User;
