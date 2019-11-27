@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import users from "./routes/user.routes";
+import company from "./routes/company.routes";
+import event from "./routes/event.routes";
 
 dotenv.config();
 const app = express();
@@ -12,13 +14,18 @@ const MONGODB_URI =
   process.env.MONGODB_URI || "mongodb://localhost/mern-boilerplate";
 
 mongoose.Promise = Promise;
-mongoose.connect(MONGODB_URI);
+mongoose.connect(MONGODB_URI, {
+  useFindAndModify: false,
+  useCreateIndex: true
+});
 
 app.use(bodyParser.json(), cors());
 app.use(express.static("dist"));
 
 const api = express.Router();
 api.use("/users", users);
+api.use("/companies", company);
+api.use("/events", event);
 app.use("/api", api);
 
 app.all("*", (req, res) => {

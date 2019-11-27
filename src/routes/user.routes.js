@@ -3,7 +3,7 @@ import User from "../model/user";
 
 const userRouter = new Router();
 
-userRouter.post("/signup", (req, res) => {
+userRouter.post("/", (req, res) => {
   User.create(req.body)
     .then(token => res.send(token))
     .catch(err => {
@@ -13,7 +13,8 @@ userRouter.post("/signup", (req, res) => {
 });
 
 userRouter.get("/", (req, res) => {
-  User.find({}, (err, users) => {
+  req.query.active = true;
+  User.find(req.query, (err, users) => {
     res.send(users);
   }).catch(err => {
     console.log(err);
@@ -22,9 +23,22 @@ userRouter.get("/", (req, res) => {
 });
 
 userRouter.get("/:id", (req, res) => {
-  User.find({ _id: req.params.id }, (err, users) => {
-    res.send(users);
+  User.findById(req.params.id, (err, user) => {
+    res.send(user);
   }).catch(err => {
+    console.log(err);
+    res.status(500).send(err);
+  });
+});
+
+userRouter.delete("/:id", (req, res) => {
+  User.findByIdAndUpdate(
+    req.params.id,
+    { $set: { active: false } },
+    (err, user) => {
+      res.send(user);
+    }
+  ).catch(err => {
     console.log(err);
     res.status(500).send(err);
   });

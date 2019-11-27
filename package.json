@@ -5,12 +5,9 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint ./",
-    "build": "webpack --mode production",
     "test": "jest -i --verbose --coverage --runInBand",
-    "start": "npm run build && node -r esm src/bin/www",
-    "client": "webpack-dev-server --mode development --open --devtool inline-source-map --hot",
-    "server": "nodemon -r esm src/bin/www",
-    "dev": "npm run dev",
+    "start": "node -r esm src/bin/www",
+    "dev": "nodemon -r esm src/bin/www",
     "dboff": "killall mongod",
     "dbon": "mongod"
   },
