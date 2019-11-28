@@ -2,10 +2,11 @@ import cors from "cors";
 import express from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
+import multer from "multer";
 import dotenv from "dotenv";
 import users from "./routes/user.routes";
 import company from "./routes/company.routes";
-import event from "./routes/event.routes";
+import engagement from "./routes/engagement.routes";
 
 dotenv.config();
 const app = express();
@@ -25,7 +26,7 @@ app.use(express.static("dist"));
 const api = express.Router();
 api.use("/users", users);
 api.use("/companies", company);
-api.use("/events", event);
+api.use("/engagements", engagement);
 app.use("/api", api);
 
 app.all("*", (req, res) => {

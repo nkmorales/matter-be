@@ -1,13 +1,37 @@
 import { Router } from "express";
+import multer from "multer";
+import csv from "fast-csv";
+import fs from "fs";
 import Engagement from "../model/engagement";
 
 const engagementRouter = new Router();
+const upload = multer({ dest: "tmp/csv/" });
 
 engagementRouter.post("/", (req, res) => {
   Engagement.create(req.body)
     .then(token => res.send(token))
     .catch(err => {
       console.log(err);
+      res.status(500).send(err);
+    });
+});
+
+engagementRouter.post("/upload", upload.single("file"), (req, res) => {
+  csv
+    .parseFile(req.file.path, { headers: true })
+    .on("data", data => {
+      Engagement.create({
+        date: data.Date,
+        startup: data.Startup,
+        name: data.Engagement,
+        partner: data["Partner, Investor, Organization"]
+      });
+    })
+    .on("end", () => {
+      fs.unlinkSync(req.file.path);
+      res.status(200).send();
+    })
+    .on("error", err => {
       res.status(500).send(err);
     });
 });

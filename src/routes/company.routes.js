@@ -1,5 +1,6 @@
 import { Router } from "express";
 import Company from "../model/company";
+import Engagement from "../model/engagement";
 
 const companyRouter = new Router();
 
@@ -25,6 +26,17 @@ companyRouter.get("/", (req, res) => {
 companyRouter.get("/:id", (req, res) => {
   Company.findById(req.params.id, (err, companies) => {
     res.send(companies);
+  }).catch(err => {
+    console.log(err);
+    res.status(500).send(err);
+  });
+});
+
+// might refactor this to change into POST request and also
+// pull from Salesforce and update score for a company
+companyRouter.get("/:name/engagements", (req, res) => {
+  Engagement.find({ startup: req.params.name }, (err, engagements) => {
+    res.send(engagements);
   }).catch(err => {
     console.log(err);
     res.status(500).send(err);
