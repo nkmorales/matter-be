@@ -23,17 +23,16 @@ companyRouter.get("/", (req, res) => {
   });
 });
 
-companyRouter.get("/:id", (req, res) => {
-  Company.findById(req.params.id, (err, companies) => {
-    res.send(companies);
+companyRouter.get("/:name", (req, res) => {
+  Company.findOne({ name: req.params.name }, (err, company) => {
+    // pull from Salesforce and update engagements
+    res.send(company);
   }).catch(err => {
     console.log(err);
     res.status(500).send(err);
   });
 });
 
-// might refactor this to change into POST request and also
-// pull from Salesforce and update score for a company
 companyRouter.get("/:name/engagements", (req, res) => {
   Engagement.find({ startup: req.params.name }, (err, engagements) => {
     res.send(engagements);

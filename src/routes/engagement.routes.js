@@ -3,13 +3,16 @@ import multer from "multer";
 import csv from "fast-csv";
 import fs from "fs";
 import Engagement from "../model/engagement";
+import { updateScore } from "../utils/utils";
 
 const engagementRouter = new Router();
 const upload = multer({ dest: "tmp/csv/" });
 
 engagementRouter.post("/", (req, res) => {
   Engagement.create(req.body)
-    .then(token => res.send(token))
+    .then(token => {
+      updateScore(req.body.startup, req.body.name).then(() => res.send(token));
+    })
     .catch(err => {
       console.log(err);
       res.status(500).send(err);
@@ -26,6 +29,9 @@ engagementRouter.post("/upload", upload.single("file"), (req, res) => {
         name: data.Engagement,
         partner: data["Partner, Investor, Organization"]
       });
+      updateScore(data.Startup, data.Engagement).catch(err =>
+        res.status(500).send(err)
+      );
     })
     .on("end", () => {
       fs.unlinkSync(req.file.path);
