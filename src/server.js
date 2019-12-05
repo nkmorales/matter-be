@@ -2,7 +2,6 @@ import cors from "cors";
 import express from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
-import multer from "multer";
 import dotenv from "dotenv";
 import users from "./routes/user.routes";
 import company from "./routes/company.routes";
