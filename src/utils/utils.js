@@ -12,37 +12,37 @@ async function updateScore(company_name, engagement) {
         });
       }
       if (engagement === "Orientation Day") {
-        company.matter_team_score += 20;
+        company.matter_team += 1;
       } else if (engagement === "Deep Dive") {
-        company.matter_team_score += 20;
+        company.matter_team += 1;
       } else if (engagement === "Pitch Practice") {
-        company.matter_team_score += 15;
+        company.matter_team += 1;
       } else if (engagement === "Pitch Deck Review") {
-        company.matter_team_score += 10;
+        company.matter_team += 1;
       } else if (engagement === "Opportunity") {
-        company.opp_conn_score += 10;
+        company.opp_conn += 1;
       } else if (engagement === "Connection") {
-        company.opp_conn_score += 7;
+        company.opp_conn += 1;
       } else if (engagement === "Conference") {
-        company.opp_conn_score += 15;
+        company.opp_conn += 1;
       } else if (engagement === "Partner Engagement") {
-        company.partner_eng_score += 15;
+        company.partner_eng += 1;
       } else if (engagement === "Partner Access") {
-        company.partner_eng_score += 15;
+        company.partner_eng += 1;
       } else if (engagement === "Mentor Clinic") {
-        company.mentor_clinic_score += 7;
+        company.mentor_clinic += 1;
       } else if (engagement === "Workshop") {
-        company.workshop_score += 7;
+        company.workshop += 1;
       } else if (engagement === "Conference Room Booking") {
-        company.fac_score += 0.5;
+        company.fac += 1;
       } else if (engagement === "KeyCard Swipe") {
-        company.fac_score += 0.1;
+        company.fac += 1;
       } else if (engagement === "MATTER Event") {
-        company.matter_event_score += 5;
+        company.matter_event += 1;
       } else if (engagement === "Hosting event") {
-        company.matter_event_score += 25;
+        company.matter_event += 1;
       }
-      company.save();
+      await company.save();
     })
     .catch(err => {
       console.log(err);
