@@ -35,6 +35,41 @@ In the development mode, we will have 2 servers running. The front end code will
 
 In the production mode, we will have only 1 server running. All the client side code will be bundled into static files using webpack and it will be served by the Node.js/Express application.
 
+## Quick Start WSL
+
+```bash
+
+# start mongo db database (if not already started)
+npm run dbon
+
+# start the server
+npm run dev
+```
+
+## Quick Start Mac
+
+```bash
+
+# start mongo db database (if not already stopped)
+npm run dbon_mac
+
+# start the server
+npm run dev
+
+```
+
+For either, nvaigate to http://localhost:9000/api/users and you should see `[]`.
+
+Turn off database (not necessary) with
+
+```bash
+# Linux/WSL
+npm run dboff
+
+# mac
+npm run dboff_mac
+```
+
 ## Quick Start
 
 ```bash
