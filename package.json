@@ -9,7 +9,10 @@
     "start": "node -r esm src/bin/www",
     "dev": "nodemon -r esm src/bin/www",
     "dboff": "killall mongod",
-    "dbon": "mongod"
+    "dbon": "mongod",
+    "dbon_mac": "brew services start mongodb-community",
+    "dboff_mac": "brew services stop mongodb-community"
+
   },
   "keywords": [],
   "author": "",
