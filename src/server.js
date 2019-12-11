@@ -14,10 +14,15 @@ const MONGODB_URI =
   process.env.MONGODB_URI || "mongodb://localhost/mern-boilerplate";
 
 mongoose.Promise = Promise;
-mongoose.connect(MONGODB_URI, {
-  useFindAndModify: false,
-  useCreateIndex: true
-});
+mongoose
+  .connect(MONGODB_URI, {
+    useFindAndModify: false,
+    useCreateIndex: true
+  })
+  .then(() => console.log("connected to MongoDB!"))
+  .catch(() =>
+    console.log("Failed to connect to MongoDB -- did you start MongoDB?")
+  );
 
 app.use(bodyParser.json(), cors());
 app.use(express.static("dist"));
