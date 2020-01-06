@@ -3,7 +3,7 @@ import multer from "multer";
 import csv from "fast-csv";
 import fs from "fs";
 import Engagement from "../model/engagement";
-import { updateScore } from "../utils/utils";
+import { updateScore, createCompanies } from "../utils/utils";
 
 const engagementRouter = new Router();
 const upload = multer({ dest: "tmp/csv/" });
@@ -20,6 +20,8 @@ engagementRouter.post("/", (req, res) => {
 });
 
 engagementRouter.post("/upload", upload.single("file"), (req, res) => {
+  let companies = new Set();
+  let engagements = [];
   csv
     .parseFile(req.file.path, { headers: true })
     .on("data", data => {
@@ -29,12 +31,18 @@ engagementRouter.post("/upload", upload.single("file"), (req, res) => {
         name: data.Engagement,
         partner: data["Partner, Investor, Organization"]
       });
-      updateScore(data.Startup, data.Engagement).catch(err =>
-        res.status(500).send(err)
-      );
+      companies.add(data.Startup);
+      engagements.push({ startup: data.Startup, engagement: data.Engagement });
     })
     .on("end", () => {
       fs.unlinkSync(req.file.path);
+      createCompanies([...companies]).then(() => {
+        engagements.forEach(engagement =>
+          updateScore(engagement.startup, engagement.engagement).catch(err => {
+            throw err;
+          })
+        );
+      });
       res.status(200).send();
     })
     .on("error", err => {

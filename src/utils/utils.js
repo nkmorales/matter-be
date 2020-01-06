@@ -1,16 +1,29 @@
 import Company from "../model/company";
 
+function createCompanies(companies) {
+  let results = companies.map(company_name => {
+    console.log(
+      Company.find().then(company => console.log("rg company: ", company))
+    );
+    return Company.findOne({ name: company_name }).then(company => {
+      if (company === null) {
+        Company.create({
+          name: company_name,
+          size: 0,
+          cohort: "filler",
+          category: "filler"
+        });
+      }
+    });
+  });
+  return Promise.all(results);
+}
+
 async function updateScore(company_name, engagement) {
   return Company.findOne({ name: company_name })
     .then(async company => {
-      if (company === null) {
-        company = await Company.create({
-          name: company_name,
-          size: 0,
-          cohort: "a",
-          category: "a"
-        });
-      }
+      if (company === null)
+        throw "Creating Score for Company that does not exist";
       if (engagement === "Orientation Day") {
         company.matter_team += 1;
       } else if (engagement === "Deep Dive") {
@@ -49,4 +62,4 @@ async function updateScore(company_name, engagement) {
     });
 }
 
-export { updateScore };
+export { updateScore, createCompanies };
