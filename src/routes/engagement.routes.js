@@ -3,7 +3,7 @@ import multer from "multer";
 import csv from "fast-csv";
 import fs from "fs";
 import Engagement from "../model/engagement";
-import { updateScore } from "../utils/utils";
+import { updateScore, createCompanies } from "../utils/utils";
 
 const engagementRouter = new Router();
 const upload = multer({ dest: "tmp/csv/" });
@@ -19,22 +19,25 @@ engagementRouter.post("/", (req, res) => {
     });
 });
 
-engagementRouter.post("/upload", upload.single("file"), (req, res) => {
+engagementRouter.post("/upload", upload.single("file"), async (req, res) => {
+  const companies = new Set();
+  const engagements = [];
   csv
     .parseFile(req.file.path, { headers: true })
     .on("data", data => {
-      Engagement.create({
-        date: data.Date,
-        startup: data.Startup,
-        name: data.Engagement,
-        partner: data["Partner, Investor, Organization"]
-      });
-      updateScore(data.Startup, data.Engagement).catch(err =>
-        res.status(500).send(err)
-      );
+      companies.add(data.Startup);
+      engagements.push(data);
     })
-    .on("end", () => {
+    .on("end", async () => {
       fs.unlinkSync(req.file.path);
+      await createCompanies([...companies]);
+      engagements.forEach(engagement => Engagement.create({
+        date: engagement.Date,
+        name: engagement.Engagement,
+        startup: engagement.Startup,
+        partner: engagement["Partner, Investor, Organization"]
+      }));
+      await Promise.all(engagements.map(engagement => updateScore(engagement.Startup, engagement.Engagement)));
       res.status(200).send();
     })
     .on("error", err => {

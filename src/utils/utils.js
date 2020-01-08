@@ -1,52 +1,55 @@
 import Company from "../model/company";
 
-async function updateScore(company_name, engagement) {
-  return Company.findOne({ name: company_name })
-    .then(async company => {
-      if (company === null) {
-        company = await Company.create({
-          name: company_name,
-          size: 0,
-          cohort: "a",
-          category: "a"
-        });
-      }
-      if (engagement === "Orientation Day") {
-        company.matter_team += 1;
-      } else if (engagement === "Deep Dive") {
-        company.matter_team += 1;
-      } else if (engagement === "Pitch Practice") {
-        company.matter_team += 1;
-      } else if (engagement === "Pitch Deck Review") {
-        company.matter_team += 1;
-      } else if (engagement === "Opportunity") {
-        company.opp_conn += 1;
-      } else if (engagement === "Connection") {
-        company.opp_conn += 1;
-      } else if (engagement === "Conference") {
-        company.opp_conn += 1;
-      } else if (engagement === "Partner Engagement") {
-        company.partner_eng += 1;
-      } else if (engagement === "Partner Access") {
-        company.partner_eng += 1;
-      } else if (engagement === "Mentor Clinic") {
-        company.mentor_clinic += 1;
-      } else if (engagement === "Workshop") {
-        company.workshop += 1;
-      } else if (engagement === "Conference Room Booking") {
-        company.fac += 1;
-      } else if (engagement === "KeyCard Swipe") {
-        company.fac += 1;
-      } else if (engagement === "MATTER Event") {
-        company.matter_event += 1;
-      } else if (engagement === "Hosting event") {
-        company.matter_event += 1;
-      }
-      await company.save();
-    })
-    .catch(err => {
-      console.log(err);
-    });
+function createCompanies(companies) {
+  const results = companies.map((companyName) => Company.findOne({ name: companyName }, (company) => {
+    if (company === null) {
+      Company.create({
+        name: companyName,
+        size: 0,
+        cohort: "filler",
+        category: "filler"
+      });
+    }
+  }).exec());
+  return Promise.all(results);
 }
 
-export { updateScore };
+async function updateScore(companyName, engagement) {
+  let key;
+  if (engagement === "Orientation Day") {
+    key = "matter_team";
+  } else if (engagement === "Deep Dive") {
+    key = "matter_team";
+  } else if (engagement === "Pitch Practice") {
+    key = "matter_team";
+  } else if (engagement === "Pitch Deck Review") {
+    key = "matter_team";
+  } else if (engagement === "Opportunity") {
+    key = "opp_conn";
+  } else if (engagement === "Connection") {
+    key = "opp_conn";
+  } else if (engagement === "Conference") {
+    key = "opp_conn";
+  } else if (engagement === "Partner Engagement") {
+    key = "partner_eng";
+  } else if (engagement === "Partner Access") {
+    key = "partner_eng";
+  } else if (engagement === "Mentor Clinic") {
+    key = "mentor_clinic";
+  } else if (engagement === "Workshop") {
+    key = "workshop";
+  } else if (engagement === "Conference Room Booking") {
+    key = "fac";
+  } else if (engagement === "KeyCard Swipe") {
+    key = "fac";
+  } else if (engagement === "MATTER Event") {
+    key = "matter_event";
+  } else if (engagement === "Hosting event") {
+    key = "matter_event";
+  }
+  const update = {};
+  update[key] = 1;
+  return Company.updateOne({ name: companyName }, { $inc: update });
+}
+
+export { updateScore, createCompanies };
