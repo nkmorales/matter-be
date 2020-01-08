@@ -19,30 +19,25 @@ engagementRouter.post("/", (req, res) => {
     });
 });
 
-engagementRouter.post("/upload", upload.single("file"), (req, res) => {
-  let companies = new Set();
-  let engagements = [];
+engagementRouter.post("/upload", upload.single("file"), async (req, res) => {
+  const companies = new Set();
+  const engagements = [];
   csv
     .parseFile(req.file.path, { headers: true })
     .on("data", data => {
-      Engagement.create({
-        date: data.Date,
-        startup: data.Startup,
-        name: data.Engagement,
-        partner: data["Partner, Investor, Organization"]
-      });
       companies.add(data.Startup);
-      engagements.push({ startup: data.Startup, engagement: data.Engagement });
+      engagements.push(data);
     })
-    .on("end", () => {
+    .on("end", async () => {
       fs.unlinkSync(req.file.path);
-      createCompanies([...companies]).then(() => {
-        engagements.forEach(engagement =>
-          updateScore(engagement.startup, engagement.engagement).catch(err => {
-            throw err;
-          })
-        );
-      });
+      await createCompanies([...companies]);
+      engagements.forEach(engagement => Engagement.create({
+        date: engagement.Date,
+        name: engagement.Engagement,
+        startup: engagement.Startup,
+        partner: engagement["Partner, Investor, Organization"]
+      }));
+      await Promise.all(engagements.map(engagement => updateScore(engagement.Startup, engagement.Engagement)));
       res.status(200).send();
     })
     .on("error", err => {
