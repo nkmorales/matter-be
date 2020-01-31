@@ -1,7 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
-////import csv from "fast-csv";
-////import fs from "fs";
+// //import csv from "fast-csv";
+// //import fs from "fs";
 import testEngagement from "../model/testEngagement";
 import { updateScore } from "../utils/utils";
 
@@ -29,9 +29,7 @@ testEngagementRouter.post("/upload", upload.single("file"), (req, res) => {
         name: data.testEngagement,
         partner: data["Partner, Investor, Organization"]
       });
-      updateScore(data.Startup, data.testEngagement).catch(err =>
-        res.status(500).send(err)
-      );
+      updateScore(data.Startup, data.testEngagement).catch(err => res.status(500).send(err));
     })
     .on("end", () => {
       fs.unlinkSync(req.file.path);

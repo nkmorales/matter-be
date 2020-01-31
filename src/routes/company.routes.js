@@ -2,7 +2,7 @@ import { Router } from "express";
 import axios from "axios";
 import Company from "../model/company";
 import Engagement from "../model/engagement";
-import { createCompanies } from "../utils/utils";
+import { createCompanies, createEngagement, updateScore } from "../utils/utils";
 
 const companyRouter = new Router();
 
@@ -26,9 +26,24 @@ companyRouter.get("/", (req, res) => {
 });
 
 companyRouter.get("/:name", (req, res) => {
-  Company.findOne({ name: req.params.name }, (err, company) => {
-    // pull from Salesforce and update engagements
-    res.send(company);
+  Company.findOne({ name: req.params.name }, async (err, company) => {
+    const config = {
+      headers: { Authorization: `Bearer ${req.query.token}` }
+    };
+    const response = await axios.get(`${process.env.INSTANCE_URL}/services/data/${process.env.VERSION}/query?q=SELECT (SELECT  Id, ActivityType, ActivityDate FROM ActivityHistories) FROM Account WHERE Id='${company.account_id}'`,
+      config).catch(error => console.log(error));
+    if (response && response.data && response.data.records) {
+      response.data.records[0].ActivityHistories.records.forEach(record => createEngagement(
+        {
+          id: record.Id,
+          startup: req.params.name,
+          activity_type: record.ActivityType ? record.ActivityType : "Partner Engagement",
+          date: record.ActivityDate
+        }
+      ));
+    }
+    // updateScore();
+    if (response) { res.send(company); } else { res.status(500).send("Error getting company"); }
   }).catch(err => {
     console.log(err);
     res.status(500).send(err);

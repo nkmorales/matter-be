@@ -1,4 +1,5 @@
 import Company from "../model/company";
+import Engagement from "../model/engagement";
 
 function createCompanies(companies) {
   const results = companies.map((companyObj) => Company.find({ name: companyObj.name }, (err, docs) => {
@@ -10,6 +11,14 @@ function createCompanies(companies) {
     }
   }).exec());
   return Promise.all(results).catch(err => console.log(err));
+}
+
+function createEngagement(engagement) {
+  Engagement.find({ id: engagement.id }, (err, docs) => {
+    if (docs.length === 0) {
+      Engagement.create(engagement);
+    }
+  });
 }
 
 async function updateScore(companyName, engagement) {
@@ -55,4 +64,6 @@ function randomString(length) {
   return result;
 }
 
-export { updateScore, createCompanies, randomString };
+export {
+  updateScore, createCompanies, randomString, createEngagement
+};
