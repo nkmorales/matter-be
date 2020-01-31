@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const engagementSchema = mongoose.Schema(
   {
+    id: { type: String, required: true },
     name: { type: String, required: true },
     startup: { type: String, required: true },
     partner: { type: String, required: true },

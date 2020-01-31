@@ -49,10 +49,10 @@ companyRouter.post("/salesforce/update", (req, res) => {
     headers: { Authorization: `Bearer ${req.body.token}` }
   };
   axios.get(
-    `${req.body.instance_url}/services/data/${process.env.VERSION}/query?q=SELECT+Id,Name,AccountSource+FROM+Account+WHERE+Member__c=true+AND+Member_Status__c='Active'`,
+    `${process.env.INSTANCE_URL}/services/data/${process.env.VERSION}/query?q=SELECT+Id,Name,AccountSource+FROM+Account+WHERE+Member__c=true+AND+Member_Status__c='Active'`,
     config
   ).then(response => {
-    const companies = response.data.records.map(record => record.Name);
+    const companies = response.data.records.map(record => ({ name: record.Name, account_id: record.Id }));
     createCompanies(companies).then(() => res.send("")).catch(err => res.status(500).send(err));
   }).catch(err => res.status(500).send(err));
 });

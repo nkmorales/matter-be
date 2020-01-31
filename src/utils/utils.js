@@ -1,13 +1,11 @@
 import Company from "../model/company";
 
 function createCompanies(companies) {
-  const results = companies.map((companyName) => Company.find({ name: companyName }, (err, docs) => {
+  const results = companies.map((companyObj) => Company.find({ name: companyObj.name }, (err, docs) => {
     if (docs.length === 0) {
       Company.create({
-        name: companyName,
-        size: 0,
-        cohort: "filler",
-        category: "filler"
+        name: companyObj.name,
+        account_id: companyObj.account_id
       });
     }
   }).exec());
@@ -15,41 +13,46 @@ function createCompanies(companies) {
 }
 
 async function updateScore(companyName, engagement) {
-  let key;
-  if (engagement === "Orientation Day") {
-    key = "matter_team";
-  } else if (engagement === "Deep Dive") {
-    key = "matter_team";
-  } else if (engagement === "Pitch Practice") {
-    key = "matter_team";
-  } else if (engagement === "Pitch Deck Review") {
-    key = "matter_team";
-  } else if (engagement === "Opportunity") {
-    key = "opp_conn";
-  } else if (engagement === "Connection") {
-    key = "opp_conn";
-  } else if (engagement === "Conference") {
-    key = "opp_conn";
-  } else if (engagement === "Partner Engagement") {
-    key = "partner_eng";
-  } else if (engagement === "Partner Access") {
-    key = "partner_eng";
-  } else if (engagement === "Mentor Clinic") {
-    key = "mentor_clinic";
-  } else if (engagement === "Workshop") {
-    key = "workshop";
-  } else if (engagement === "Conference Room Booking") {
-    key = "fac";
-  } else if (engagement === "KeyCard Swipe") {
-    key = "fac";
-  } else if (engagement === "MATTER Event") {
-    key = "matter_event";
-  } else if (engagement === "Hosting event") {
-    key = "matter_event";
-  }
   const update = {};
-  update[key] = 1;
+  if (engagement === "Orientation Day") {
+    update.matter_team = 20;
+  } else if (engagement === "Deep Dive") {
+    update.matter_team = 20;
+  } else if (engagement === "Pitch Practice") {
+    update.matter_team = 15;
+  } else if (engagement === "Pitch Deck Review") {
+    update.matter_team = 10;
+  } else if (engagement === "Opportunity") {
+    update.opp_conn = 0;
+  } else if (engagement === "Connection") {
+    update.opp_conn = 7;
+  } else if (engagement === "Conference") {
+    update.opp_conn = 15;
+  } else if (engagement === "Partner Engagement") {
+    update.partner_eng = 15;
+  } else if (engagement === "Partner Access") {
+    update.partner_eng = 15;
+  } else if (engagement === "Mentor Clinic") {
+    update.mentor_clinic = 7;
+  } else if (engagement === "Workshop") {
+    update.workshop = 7;
+  } else if (engagement === "Conference Room Booking") {
+    update.fac = 0.5;
+  } else if (engagement === "KeyCard Swipe") {
+    update.fac = 0.1;
+  } else if (engagement === "MATTER Event") {
+    update.matter_event = 5;
+  } else if (engagement === "Hosting event") {
+    update.matter_event = 25;
+  }
   return Company.updateOne({ name: companyName }, { $inc: update });
 }
 
-export { updateScore, createCompanies };
+function randomString(length) {
+  const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let result = "";
+  for (let i = length; i > 0; i -= 1) result += chars[Math.floor(Math.random() * chars.length)];
+  return result;
+}
+
+export { updateScore, createCompanies, randomString };

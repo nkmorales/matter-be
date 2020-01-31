@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const companySchema = mongoose.Schema(
   {
     name: { type: String, required: true, unique: true },
-    size: { type: Number, required: false, default: 0 },
+    account_id: { type: String, required: false, default: "" },
     matter_team: { type: Number, required: true, default: 0 },
     workshop: { type: Number, required: true, default: 0 },
     partner_eng: { type: Number, required: true, default: 0 },

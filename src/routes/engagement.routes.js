@@ -1,9 +1,9 @@
 import { Router } from "express";
 import multer from "multer";
-import csv from "fast-csv";
 import fs from "fs";
+import csv from "fast-csv";
 import Engagement from "../model/engagement";
-import { updateScore, createCompanies } from "../utils/utils";
+import { updateScore, createCompanies, randomString } from "../utils/utils";
 
 const engagementRouter = new Router();
 const upload = multer({ dest: "tmp/csv/" });
@@ -38,6 +38,7 @@ engagementRouter.post("/upload", upload.single("file"), async (req, res) => {
       }
       try {
         await Promise.all(engagements.map(engagement => Engagement.create({
+          id: randomString(17),
           date: engagement.Date,
           name: engagement.Engagement,
           startup: engagement.Startup,
@@ -53,9 +54,7 @@ engagementRouter.post("/upload", upload.single("file"), async (req, res) => {
       }
       return res.status(200).send();
     })
-    .on("error", err => {
-      res.status(500).send(err);
-    });
+    .on("error", err => res.status(500).send(err));
 });
 
 engagementRouter.get("/", (req, res) => {
