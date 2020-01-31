@@ -22,6 +22,7 @@ engagementRouter.post("/", (req, res) => {
 engagementRouter.post("/upload", upload.single("file"), async (req, res) => {
   const companies = new Set();
   const engagements = [];
+  if (!req.file) { res.status(400).send("Bad request -- must send file"); }
   csv
     .parseFile(req.file.path, { headers: true })
     .on("data", data => {
@@ -30,15 +31,27 @@ engagementRouter.post("/upload", upload.single("file"), async (req, res) => {
     })
     .on("end", async () => {
       fs.unlinkSync(req.file.path);
-      await createCompanies([...companies]);
-      engagements.forEach(engagement => Engagement.create({
-        date: engagement.Date,
-        name: engagement.Engagement,
-        startup: engagement.Startup,
-        partner: engagement["Partner, Investor, Organization"]
-      }));
-      await Promise.all(engagements.map(engagement => updateScore(engagement.Startup, engagement.Engagement)));
-      res.status(200).send();
+      try {
+        await createCompanies([...companies]);
+      } catch {
+        return res.status(500).send("Error creating companies");
+      }
+      try {
+        await Promise.all(engagements.map(engagement => Engagement.create({
+          date: engagement.Date,
+          name: engagement.Engagement,
+          startup: engagement.Startup,
+          partner: engagement["Partner, Investor, Organization"]
+        })));
+      } catch {
+        return res.status(500).send("Error creating engagements");
+      }
+      try {
+        await Promise.all(engagements.map(engagement => updateScore(engagement.Startup, engagement.Engagement)));
+      } catch {
+        return res.status(500).send("Error updating engagement scores");
+      }
+      return res.status(200).send();
     })
     .on("error", err => {
       res.status(500).send(err);
