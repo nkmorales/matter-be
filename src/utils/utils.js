@@ -1,8 +1,8 @@
 import Company from "../model/company";
 
 function createCompanies(companies) {
-  const results = companies.map((companyName) => Company.findOne({ name: companyName }, (company) => {
-    if (company === null) {
+  const results = companies.map((companyName) => Company.find({ name: companyName }, (err, docs) => {
+    if (docs.length === 0) {
       Company.create({
         name: companyName,
         size: 0,
@@ -11,7 +11,7 @@ function createCompanies(companies) {
       });
     }
   }).exec());
-  return Promise.all(results);
+  return Promise.all(results).catch(err => console.log(err));
 }
 
 async function updateScore(companyName, engagement) {

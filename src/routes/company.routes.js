@@ -1,6 +1,8 @@
 import { Router } from "express";
+import axios from "axios";
 import Company from "../model/company";
 import Engagement from "../model/engagement";
+import { createCompanies } from "../utils/utils";
 
 const companyRouter = new Router();
 
@@ -40,6 +42,19 @@ companyRouter.get("/:name/engagements", (req, res) => {
     console.log(err);
     res.status(500).send(err);
   });
+});
+
+companyRouter.post("/salesforce/update", (req, res) => {
+  const config = {
+    headers: { Authorization: `Bearer ${req.body.token}` }
+  };
+  axios.get(
+    `${req.body.instance_url}/services/data/${process.env.VERSION}/query?q=SELECT+Id,Name,AccountSource+FROM+Account+WHERE+Member__c=true+AND+Member_Status__c='Active'`,
+    config
+  ).then(response => {
+    const companies = response.data.records.map(record => record.Name);
+    createCompanies(companies).then(() => res.send("")).catch(err => res.status(500).send(err));
+  }).catch(err => res.status(500).send(err));
 });
 
 companyRouter.patch("/:id", (req, res) => {

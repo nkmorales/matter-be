@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 
 const companySchema = mongoose.Schema(
   {
-    name: { type: String, required: true },
-    size: { type: Number, required: true, default: 0 },
+    name: { type: String, required: true, unique: true },
+    size: { type: Number, required: false, default: 0 },
     matter_team: { type: Number, required: true, default: 0 },
     workshop: { type: Number, required: true, default: 0 },
     partner_eng: { type: Number, required: true, default: 0 },
@@ -11,8 +11,8 @@ const companySchema = mongoose.Schema(
     opp_conn: { type: Number, required: true, default: 0 },
     mentor_clinic: { type: Number, required: true, default: 0 },
     fac: { type: Number, required: true, default: 0 },
-    category: { type: String, required: true, default: "" },
-    cohort: { type: String, required: true, default: "" },
+    category: { type: String, required: false, default: "" },
+    cohort: { type: String, required: false, default: "" },
     active: { type: Boolean, required: true, default: true }
   },
   { timestamps: true }
