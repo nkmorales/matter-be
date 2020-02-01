@@ -42,7 +42,7 @@ engagementRouter.post("/upload", upload.single("file"), async (req, res) => {
         await Promise.all(engagements.map(engagement => createEngagement({
           id: randomString(17),
           date: engagement.Date,
-          name: engagement.Engagement,
+          activity_type: engagement.Engagement,
           startup: engagement.Startup,
           partner: engagement["Partner, Investor, Organization"]
         })));
@@ -50,7 +50,7 @@ engagementRouter.post("/upload", upload.single("file"), async (req, res) => {
         return res.status(500).send("Error creating engagements");
       }
       try {
-        await Promise.all(engagements.map(() => updateScore()));
+        await Promise.all(engagements.map((engagement) => updateScore(engagement.Startup)));
       } catch {
         return res.status(500).send("Error updating engagement scores");
       }

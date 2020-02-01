@@ -27,12 +27,13 @@ companyRouter.get("/", (req, res) => {
 
 companyRouter.get("/:name", (req, res) => {
   Company.findOne({ name: req.params.name }, async (err, company) => {
+    if (company === null) return res.status(400).send("Not found");
     const config = {
       headers: { Authorization: `Bearer ${req.query.token}` }
     };
     const response = await axios.get(`${process.env.INSTANCE_URL}/services/data/${process.env.VERSION}/query?q=SELECT (SELECT  Id, ActivityType, ActivityDate FROM ActivityHistories) FROM Account WHERE Id='${company.account_id}'`,
-      config).catch(error => console.log(error));
-    if (response && response.data && response.data.records) {
+      config).catch(error => {});
+    if (response && response.status === 200 && response.data && response.data.records) {
       response.data.records[0].ActivityHistories.records.forEach(record => createEngagement(
         {
           id: record.Id,
@@ -41,9 +42,12 @@ companyRouter.get("/:name", (req, res) => {
           date: record.ActivityDate
         }
       ));
+    } else {
+      return res.send(company);
     }
-    // updateScore();
-    if (response) { res.send(company); } else { res.status(500).send("Error getting company"); }
+    // updateScore(req.params.name).then(() => {
+    //   if (response) { res.send(company); } else { res.status(500).send("Error getting company"); }
+    // });
   }).catch(err => {
     console.log(err);
     res.status(500).send(err);
