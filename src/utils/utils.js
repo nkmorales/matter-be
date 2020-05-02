@@ -1,16 +1,17 @@
 import Company from "../model/company";
 import Engagement from "../model/engagement";
 
-function createCompanies(companies) {
-  const results = companies.map((companyObj) => Company.find({ name: companyObj.name }).exec().then((docs) => {
+async function createCompanies(companies) {
+  for (let i = 0; i < companies.length; i += 1) {
+    const company = companies[i];
+    const docs = await Company.find({ name: company.name }).exec();
     if (docs.length === 0) {
       Company.create({
-        name: companyObj.name,
-        account_id: companyObj.account_id
+        name: company.name,
+        account_id: company.account_id
       });
     }
-  }));
-  return Promise.all(results).catch(err => console.log(err));
+  }
 }
 
 function createEngagement(engagement) {
