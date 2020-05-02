@@ -142,6 +142,9 @@ userRouter.post("/salesforce/auth", (req, res) => {
   axios.post(`https://login.salesforce.com/services/oauth2/token?username=${process.env.USERNAME}&password=${process.env.PASSWORD}${process.env.SECURITY_TOKEN}&grant_type=${process.env.GRANT_TYPE}&client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}`)
     .then(resp => {
       res.send(resp.data);
+    }).catch(err => {
+      console.error(err);
+      res.status(500).send(err);
     });
 });
 

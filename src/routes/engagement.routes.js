@@ -50,6 +50,7 @@ engagementRouter.post("/upload", upload.single("file"), async (req, res) => {
         return res.status(500).send("Error creating engagements");
       }
       try {
+        console.log("trying to update score");
         await Promise.all(engagements.map((engagement) => updateScore(engagement.Startup)));
       } catch {
         return res.status(500).send("Error updating engagement scores");
