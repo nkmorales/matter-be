@@ -3,17 +3,16 @@ import express from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
+import passport from "passport";
 import users from "./routes/user.routes";
 import company from "./routes/company.routes";
 import engagement from "./routes/engagement.routes";
 import ping from "./routes/ping.routes";
-import key from "./utils/keys"
-import passport from "passport";
 
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 9000;
-const MONGODB_URI = process.env.MONGODB_URI || key.mongoURI;
+const { MONGODB_URI } = process.env;
 
 mongoose.Promise = Promise;
 mongoose
@@ -25,17 +24,17 @@ mongoose
   .catch(() => console.log("Failed to connect to MongoDB -- did you start MongoDB?"));
 
 app.use(
-    bodyParser.urlencoded({
-      extended: false
-    })
-);  
+  bodyParser.urlencoded({
+    extended: false
+  })
+);
 app.use(bodyParser.json(), cors());
 app.use(express.static("dist"));
 
 // Passport middleware
 app.use(passport.initialize());
 // Passport config
-//require("./utils/passport")(passport);
+// require("./utils/passport")(passport);
 
 const api = express.Router();
 api.use("/users", users);

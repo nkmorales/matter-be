@@ -1,12 +1,11 @@
 import { Router } from "express";
 import axios from "axios";
-import User from "../model/user";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import keys from "../utils/keys";
+import User from "../model/user";
 // Load input validation
 import validateRegisterInput from "../utils/register";
-import  validateLoginInput from "../utils/login";
+import validateLoginInput from "../utils/login";
 
 const userRouter = new Router();
 
@@ -14,32 +13,31 @@ const userRouter = new Router();
 // @desc Register user
 // @access Public
 userRouter.post("/register", (req, res) => {
-const { errors, isValid } = validateRegisterInput(req.body);
+  const { errors, isValid } = validateRegisterInput(req.body);
 
-// Check validation
+  // Check validation
   if (!isValid) {
     return res.status(400).json(errors);
   }
-User.findOne({ email: req.body.email }).then(user => {
+  User.findOne({ email: req.body.email }).then(user => {
     if (user) {
       return res.status(400).json({ email: "Email already exists" });
-    } else {
-      const newUser = new User({
-        password: req.body.password,
-        email: req.body.email
-      });
-// Hash password before saving in database
-      bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(newUser.password, salt, (err, hash) => {
-          if (err) throw err;
-          newUser.password = hash;
-          newUser
-            .save()
-            .then(user => res.json(user))
-            .catch(err => console.log(err));
-        });
-      });
     }
+    const newUser = new User({
+      password: req.body.password,
+      email: req.body.email
+    });
+    // Hash password before saving in database
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(newUser.password, salt, (err, hash) => {
+        if (err) throw err;
+        newUser.password = hash;
+        newUser
+          .save()
+          .then(user => res.json(user))
+          .catch(err => console.log(err));
+      });
+    });
   });
 });
 
@@ -48,20 +46,20 @@ User.findOne({ email: req.body.email }).then(user => {
 // @access Public
 userRouter.post("/login", (req, res) => {
   // Form validation
-const { errors, isValid } = validateLoginInput(req.body);
-// Check validation
+  const { errors, isValid } = validateLoginInput(req.body);
+  // Check validation
   if (!isValid) {
     return res.status(400).json(errors);
   }
-const email = req.body.email;
-  const password = req.body.password;
-// Find user by email
+  const { email } = req.body;
+  const { password } = req.body;
+  // Find user by email
   User.findOne({ email }).then(user => {
     // Check if user exists
     if (!user) {
       return res.status(404).json({ emailnotfound: "Email not found" });
     }
-// Check password
+    // Check password
     bcrypt.compare(password, user.password).then(isMatch => {
       if (isMatch) {
         // User matched
@@ -69,17 +67,17 @@ const email = req.body.email;
         const payload = {
           id: user.id,
         };
-// Sign token
+        // Sign token
         jwt.sign(
           payload,
-          keys.secretOrKey,
+          process.env.SECRET_OR_KEY,
           {
             expiresIn: 31556926 // 1 year in seconds
           },
           (err, token) => {
             res.json({
               success: true,
-              token: "Bearer " + token
+              token: `Bearer ${token}`
             });
           }
         );
@@ -91,10 +89,6 @@ const email = req.body.email;
     });
   });
 });
-
-
-
-
 
 
 // userRouter.post("/", (req, res) => {

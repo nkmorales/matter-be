@@ -13,7 +13,6 @@
     "dbon": "mongod",
     "dbon_mac": "brew services start mongodb-community",
     "dboff_mac": "brew services stop mongodb-community"
-    
   },
   "keywords": [],
   "author": "",
